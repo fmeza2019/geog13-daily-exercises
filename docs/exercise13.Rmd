@@ -1,0 +1,12 @@
+library(sf)
+library(rmapshaper)
+library(dplyr)
+library(ggplot2)
+CONUS = USAboundaries::us_states() %>%
+filter(!stusps %in% c("PR", "AK", "HI")) %>%
+
+
+name = st_transform(CONUS, 5070)
+simp_states_st = st_simplify(name, dTolerance = 20000)
+simp_states_ms = ms_simplify(name, keep = .05)
+mapview::npts(name)

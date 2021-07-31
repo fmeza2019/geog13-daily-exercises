@@ -50,7 +50,7 @@ Use `dplyr` verbs to  create a data.frame of the **5** counties with the most cu
 
 ```{r, eval = TRUE}
 covid %>% 
-  select(county, date, cases) %>% 
+  select(state,county, cases, date) %>% 
   filter(date == max(date)) %>% 
   slice_max(cases, n = 5)
 ```
@@ -65,6 +65,9 @@ Use `dplyr` verbs to create a data.frame of the **5** states with the _most_ cas
 covid %>% 
   select(state, date, cases) %>% 
   filter(date == max(date)) %>%
+  group_by(state) %>% 
+  summarize(cases = sum(cases)) %>% 
+  ungroup() %>% 
   arrange(-cases) %>% 
   slice_max(cases, n = 5)
 ```
@@ -76,10 +79,10 @@ Use the `dplyr` verbs to report the **5** counties with the _worst_ current deat
 (**Hint:** You will need to remove those where `cases == 0` and `county == Unknown`)
 (**Hint:** `filter`, `mutate`, `arrange`, `slice`)
 
-```{r}
+```{r, eval = TRUE}
 covid %>% 
   select(county,deaths,cases,date) %>% 
-  filter(cases > 0) %>% 
+  filter(cases > 0, date ==max(date)) %>% 
   mutate(deathratio = 100 * (deaths/cases)) %>% 
   arrange(-deathratio) %>% 
   slice_max(cases, n = 5)
@@ -92,13 +95,13 @@ Use the `dplyr` verbs to report the **5** states with the _worst_ current death/
 
 (**Hint:** `filter`, `group_by`, `summarize`, `mutate`, `arrange`, `slice`)
 
-```{r}
+```{r, eval = TRUE}
 covid %>% 
   select(state,deaths,cases,date) %>% 
-  filter(cases > 0) %>% 
-  mutate(deathratio = 100 * (deaths/cases)) %>% 
-  arrange(-deathratio) %>% 
-  slice_max(cases, n = 5)
+  filter(cases > 0, state !="unknown", date == max(date)) %>% 
+  group_by(state) %>% 
+  summarize(totcases = sum(cases), totdeaths = sum(deaths), ratio = 100 * totdeaths/totcases) %>% 
+  slice_max(ratio, n = 5)
 ```
 
 # END
